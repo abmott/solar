@@ -2,6 +2,7 @@ require 'net/http'
 require 'uri'
 require 'snitcher'
 require 'sqlite3'
+require 'yaml'
 
 def open(url)
   Net::HTTP.get(URI.parse(url))
@@ -10,6 +11,7 @@ end
 time = Time.new
 today = time.strftime("%d-%m-%Y")
 currenttime=time.to_i
+config = YAML::load_file('/home/pi/solar/solar-config.yml')
 
 page_content = open('http://192.168.1.101/production')
 production = page_content.split("Today</td>     <td> ")[1].split(" kWh")[0]
@@ -17,13 +19,13 @@ puts "Todays production #{production}"
 
 datadogoutput = `curl -sS -X POST -H "Content-type: application/json" -d \
    '{"series":\
-         [{"metric":"solar.production",
+         [{"metric":"solar.production.day",
           "points":[[#{currenttime}, #{production}]],
           "host":"1418.w.lavitt",
           "tags":["environment:home"]}
         ]
 }' \
-https://app.datadoghq.com/api/v1/series?api_key=#{API_KEY}`
+https://app.datadoghq.com/api/v1/series?api_key=#{config["secrets"][0]["secret"]}`
 
 begin
 db = SQLite3::Database.open "solardata.db"
