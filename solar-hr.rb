@@ -17,7 +17,7 @@ page_content = open('http://192.168.1.101/production')
 production = page_content.split("Today</td>     <td> ")[1].split(" kWh")[0]
 #puts "Todays production #{production}"
 
-hr_file = File.open('solar_prod_hr.txt', 'r')
+hr_file = File.open('/home/pi/solar/solar_prod_hr.txt', 'r')
 previous_prod_hr = hr_file.read
 
 #puts previous_prod_hr
